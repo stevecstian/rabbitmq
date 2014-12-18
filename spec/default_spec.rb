@@ -5,7 +5,6 @@ describe 'rabbitmq::default' do
   let(:node) { runner.node }
 
   let(:chef_run) do
-    node.set['rabbitmq']['config'] = '/path/to/rabbitmq'
     runner.converge(described_recipe)
   end
 
@@ -118,11 +117,20 @@ describe 'rabbitmq::default' do
     end
   end
 
-  it 'creates a template rabbitmq.config with attributes' do
-    expect(chef_run).to create_template('/path/to/rabbitmq.config').with(
-      :user => 'root',
-      :group => 'root',
-      :source => 'rabbitmq.config.erb',
-      :mode => 00644)
+  describe 'config-file-location' do
+    let(:runner) { ChefSpec::ServerRunner.new(REDHAT_OPTS) }
+    let(:node) { runner.node }
+    let(:chef_run) do
+      node.set['rabbitmq']['config'] = '/path/to/rabbitmq'
+      runner.converge(described_recipe)
+    end
+
+    it 'creates a template rabbitmq.config with attributes' do
+      expect(chef_run).to create_template('/path/to/rabbitmq.config').with(
+        :user => 'root',
+        :group => 'root',
+        :source => 'rabbitmq.config.erb',
+        :mode => 00644)
+    end
   end
 end
